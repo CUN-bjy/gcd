@@ -28,7 +28,7 @@ class CustomCIFAR10(CIFAR10):
 class CustomCIFAR100(CIFAR100):
 
     def __init__(self, *args, **kwargs):
-        super(CustomCIFAR100, self).__init__(*args, **kwargs)
+        super(CustomCIFAR100, self).__init__(download = True, *args, **kwargs)
 
         self.uq_idxs = np.array(range(len(self)))
 
