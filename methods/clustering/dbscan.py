@@ -81,10 +81,10 @@ def test_kmeans_semi_sup(merge_test_loader, args, K=None):
     total_feats = np.concatenate((l_feats, u_feats), axis=0)
     total_targets = np.concatenate((l_targets, u_targets), axis=0)
     
-    masked_target = total_targets[:]
+    masked_target = targets[:]
     masked_target[~mask_lab] = -1
     # embedding = umap.UMAP()
-    embedding = umap.UMAP(random_state = 0).fit_transform(total_feats, y=masked_target)
+    embedding = umap.UMAP(n_components=128).fit_transform(all_feats, y=masked_target)
     # print(total_feats.shape)
     # print(total_targets.shape)
     # print(np.unique(total_targets))
@@ -93,6 +93,7 @@ def test_kmeans_semi_sup(merge_test_loader, args, K=None):
     # scaler.fit(total_feats)
 
     # total_feat_scaled = scaler.transform(total_feats)
+    # total_feat_scaled = all_feats
     total_feat_scaled = embedding
 
     # print(args.eps, args.min_samples)
@@ -118,11 +119,12 @@ def test_kmeans_semi_sup(merge_test_loader, args, K=None):
     max_new_acc_tup = (0,0)
 
     print('Starting DBSCAN... with various eps')
-    print('Current min_sample: '+str(args.min_samples))
-    for min_sample_num in range(2, 15):
-        for eps_delta in range(25):
+    
+    for min_sample_num in range(5, 50):
+        for eps_delta in range(10):
             eps = args.eps+eps_delta*0.02
             dbscan = DBSCAN(eps=eps, min_samples=min_sample_num)
+            # dbscan = DBSCAN(metric='cosine', eps=eps, min_samples=min_sample_num)
             clusters = dbscan.fit_predict(total_feat_scaled)
             preds = clusters[~mask_lab]
             unique, count = np.unique(preds, return_counts = True)
@@ -247,7 +249,7 @@ if __name__ == "__main__":
     parser.add_argument('--prop_train_labels', type=float, default=0.5)
     parser.add_argument('--eval_funcs', nargs='+', help='Which eval functions to use', default=['v1', 'v2'])
     parser.add_argument('--use_ssb_splits', type=str2bool, default=True)
-    parser.add_argument('--eps', type=float, default = 0.2)
+    parser.add_argument('--eps', type=float, default = 0.05)
     parser.add_argument('--min_samples', type =int, default = 10 )
 
     # ----------------------
