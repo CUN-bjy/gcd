@@ -18,7 +18,7 @@ python -m methods.contrastive_training.contrastive_training \
             --grad_from_block 11 \
             --epochs 200 \
             --base_model vit_dino \
-            --num_workers 4 \
+            --num_workers 32 \
             --use_ssb_splits 'True' \
             --sup_con_weight 0.35 \
             --weight_decay 5e-5 \

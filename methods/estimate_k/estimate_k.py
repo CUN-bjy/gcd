@@ -17,6 +17,7 @@ from tqdm import tqdm
 
 from scipy.optimize import minimize_scalar
 from functools import partial
+import time
 
 # TODO: Debug
 import warnings
@@ -162,7 +163,7 @@ def binary_search(merge_test_loader, args):
     small_k = min_classes
     diff = big_k - small_k
     middle_k = int(0.5 * diff + small_k)
-
+    
     labelled_acc_big = test_kmeans(big_k, merge_test_loader, args)
     labelled_acc_small = test_kmeans(small_k, merge_test_loader, args)
     labelled_acc_middle = test_kmeans(middle_k, merge_test_loader, args)
@@ -254,6 +255,8 @@ if __name__ == "__main__":
     # DATASETS
     # --------------------
     print('Building datasets...')
+    print('starting now...')
+    start_time = time.time()
     train_transform, test_transform = None, None
     train_dataset, test_dataset, unlabelled_train_examples_test, datasets = get_datasets(args.dataset_name,
                                                                                          train_transform, test_transform, args)
@@ -280,3 +283,5 @@ if __name__ == "__main__":
         scipy_optimise(merge_test_loader=train_loader, args=args)
     else:
         binary_search(train_loader, args)
+    print("finished now...")
+    print(time.time()-start_time)

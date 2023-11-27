@@ -103,7 +103,7 @@ def get_imagenet_100_datasets(train_transform, test_transform, train_classes=ran
     np.random.seed(seed)
 
     # Subsample imagenet dataset initially to include 100 classes
-    subsampled_100_classes = np.random.choice(range(1000), size=(100,), replace=False)
+    subsampled_100_classes = np.random.choice(range(100), size=(100,), replace=False)
     subsampled_100_classes = np.sort(subsampled_100_classes)
     print(f'Constructing ImageNet-100 dataset from the following classes: {subsampled_100_classes.tolist()}')
     cls_map = {i: j for i, j in zip(subsampled_100_classes, range(100))}

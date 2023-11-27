@@ -107,6 +107,8 @@ if __name__ == "__main__":
         state_dict = torch.load(pretrain_path, map_location='cpu')
         model.load_state_dict(state_dict)
 
+        
+
         _, val_transform = get_transform('imagenet', image_size=224, args=args)
 
     elif args.model_name == 'resnet50_dino':
@@ -138,8 +140,16 @@ if __name__ == "__main__":
             args.save_dir += '_(' + args.warmup_model_dir.split('(')[1].split(')')[0] + ')'
 
         print(f'Using weights from {args.warmup_model_dir} ...')
-        state_dict = torch.load(args.warmup_model_dir)
-        model.load_state_dict(state_dict)
+        # ----------------------
+        # LOAD FEATURE EXTRACTOR
+        # ----------------------
+        ckpt = torch.load(args.warmup_model_dir)
+        for k, v in model.state_dict().items():
+            v.copy_(ckpt['model'][f"0.{k}"] if args.dataset=="imagenet_100" else ckpt[k])
+
+        # state_dict = torch.load(args.warmup_model_dir)
+        # print(state_dict.keys())
+        # model.load_state_dict(state_dict)
 
         print(f'Saving to {args.save_dir}')
 

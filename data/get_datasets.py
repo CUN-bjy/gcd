@@ -103,8 +103,8 @@ def get_class_splits(args):
     elif args.dataset_name == 'cifar100':
 
         args.image_size = 32
-        args.train_classes = range(80)
-        args.unlabeled_classes = range(80, 100)
+        args.train_classes = range(50)
+        args.unlabeled_classes = range(50, 100)
 
     elif args.dataset_name == 'tinyimagenet':
 

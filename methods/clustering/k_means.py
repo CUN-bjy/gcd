@@ -15,6 +15,7 @@ from methods.clustering.faster_mix_k_means_pytorch import K_Means as SemiSupKMea
 
 from tqdm import tqdm
 from config import feature_extract_dir
+import time
 
 # TODO: Debug
 import warnings
@@ -37,6 +38,7 @@ def test_kmeans_semi_sup(merge_test_loader, args, K=None):
 
     print('Collating features...')
     # First extract all features
+    start_time = time.time()
     for batch_idx, (feats, label, _, mask_lab_) in enumerate(tqdm(merge_test_loader)):
 
         feats = feats.to(device)
@@ -49,6 +51,8 @@ def test_kmeans_semi_sup(merge_test_loader, args, K=None):
                                          else False for x in label]))
         mask_lab = np.append(mask_lab, mask_lab_.cpu().bool().numpy())
 
+    end_time = time.time()-start_time
+    print("Collating features took %d" % end_time)
     # -----------------------
     # K-MEANS
     # -----------------------
@@ -61,8 +65,12 @@ def test_kmeans_semi_sup(merge_test_loader, args, K=None):
     u_feats = all_feats[~mask_lab]      # Get unlabelled set
     l_targets = targets[mask_lab]       # Get labelled targets
     u_targets = targets[~mask_lab]       # Get unlabelled targets
+    print(np.unique(l_targets))
+    print(np.unique(u_targets))
 
     print('Fitting Semi-Supervised K-Means...')
+    start_time = time.time()
+    print('K is %d' % K)
     kmeans = SemiSupKMeans(k=K, tolerance=1e-4, max_iterations=args.max_kmeans_iter, init='k-means++',
                            n_init=args.k_means_init, random_state=None, n_jobs=None, pairwise_batch_size=1024, mode=None)
 
@@ -86,9 +94,12 @@ def test_kmeans_semi_sup(merge_test_loader, args, K=None):
     # -----------------------
     # EVALUATE
     # -----------------------
+    print('Evaluating')
+    print(np.unique(preds))
     all_acc, old_acc, new_acc = log_accs_from_preds(y_true=u_targets, y_pred=preds, mask=mask, eval_funcs=args.eval_funcs,
                                                     save_name='SS-K-Means Train ACC Unlabelled', print_output=True)
-
+    end_time = time.time()-start_time
+    print("K means took %d" % end_time)
     return all_acc, old_acc, new_acc, kmeans
 
 
