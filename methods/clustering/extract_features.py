@@ -20,7 +20,7 @@ from data.fgvc_aircraft import FGVCAircraft, aircraft_root
 from project_utils.general_utils import strip_state_dict, str2bool
 from copy import deepcopy
 
-from config import feature_extract_dir, dino_pretrain_path
+from config import feature_extract_dir
 
 def extract_features_dino(model, loader, save_dir):
 
@@ -100,14 +100,8 @@ if __name__ == "__main__":
         extract_features_func = extract_features_dino
         args.interpolation = 3
         args.crop_pct = 0.875
-        pretrain_path = dino_pretrain_path
 
-        model = torch.hub.load('facebookresearch/dino:main', 'dino_vitb16', pretrained=False)
-
-        state_dict = torch.load(pretrain_path, map_location='cpu')
-        model.load_state_dict(state_dict)
-
-        
+        model = torch.hub.load('facebookresearch/dino:main', 'dino_vitb16')
 
         _, val_transform = get_transform('imagenet', image_size=224, args=args)
 
@@ -130,14 +124,7 @@ if __name__ == "__main__":
         raise NotImplementedError
 
     if args.warmup_model_dir is not None:
-
-        warmup_id = args.warmup_model_dir.split('(')[1].split(')')[0]
-
-        if args.use_best_model:
-            args.warmup_model_dir = args.warmup_model_dir[:-3] + '_best.pt'
-            args.save_dir += '_(' + args.warmup_model_dir.split('(')[1].split(')')[0] + ')_best'
-        else:
-            args.save_dir += '_(' + args.warmup_model_dir.split('(')[1].split(')')[0] + ')'
+        args.save_dir = args.warmup_model_dir[:-len(args.warmup_model_dir.split('/')[-1])]
 
         print(f'Using weights from {args.warmup_model_dir} ...')
         # ----------------------

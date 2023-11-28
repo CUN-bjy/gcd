@@ -2,3 +2,6 @@ save_dir/
 download_resources/
 feat_dir/
 imagenet/
+dataset/*
+.python-version
+*.pyc
